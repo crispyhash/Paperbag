@@ -1,0 +1,1255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PaperBag Pro • Accounting</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Space+Grotesk:wght@500;600&amp;display=swap');
+        body { font-family: 'Inter', system_ui, sans-serif; }
+        .heading-font { font-family: 'Space Grotesk', 'Inter', sans-serif; font-weight: 600; }
+        .nav-tab { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+        .nav-tab.active { background-color: #0f766e; color: white; box-shadow: 0 4px 6px -1px rgb(15 118 110 / 0.1); }
+        .section { display: none; }
+        .section.active { display: block; }
+        .nav-item.active { border-left: 3px solid #0f766e; background-color: #f0fdfa; font-weight: 600; }
+        .section-header { font-size: 1.35rem; font-weight: 700; }
+    </style>
+</head>
+<body class="bg-slate-50">
+    <!-- Top Navigation -->
+    <div class="bg-white border-b border-slate-200 shadow-sm sticky top-0 z-50">
+        <div class="max-w-screen-2xl mx-auto">
+            <div class="px-6 py-4 flex items-center justify-between">
+                <div class="flex items-center gap-x-3">
+                    <div class="flex items-center gap-x-2.5">
+                        <div class="w-10 h-10 bg-teal-800 rounded-2xl flex items-center justify-center shadow-inner">
+                            <i class="fa-solid fa-boxes-packing text-white text-3xl"></i>
+                        </div>
+                        <div>
+                            <span class="font-extrabold text-3xl tracking-tighter heading-font text-slate-800">PaperBag</span>
+                            <span class="font-bold text-teal-700 text-xl tracking-tighter">Pro</span>
+                        </div>
+                    </div>
+                    <div class="px-3 py-1 bg-teal-50 text-teal-700 text-xs font-bold rounded-2xl flex items-center gap-x-1.5">
+                        <i class="fa-solid fa-industry fa-sm"></i>
+                        <span class="font-semibold">Manufacturing</span>
+                    </div>
+                </div>
+                
+                <div class="flex items-center gap-x-2">
+                    <div onclick="showSettingsModal()" class="hidden md:flex items-center gap-x-2 px-3 py-1.5 bg-white border border-slate-200 hover:border-slate-300 rounded-3xl cursor-pointer">
+                        <div class="text-right">
+                            <div id="header-company-name" class="font-bold text-sm text-slate-800">Shree Paper Bags</div>
+                            <div id="header-gstin" class="text-[10px] text-slate-500 font-medium">GSTIN: 27AABPS1234A1Z5</div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center gap-x-[5px]">
+                        <button onclick="exportAllData()" class="flex items-center gap-x-2 px-3.5 py-2 text-sm font-semibold bg-white hover:bg-slate-100 transition-colors border border-slate-200 text-slate-700 rounded-3xl px-4 text-xs">
+                            <i class="fa-solid fa-download mr-1.5"></i> <span class="hidden md:inline">Backup</span>
+                        </button>
+                        <button onclick="importDataPrompt()" class="flex items-center gap-x-2 px-3.5 py-2 text-sm font-semibold bg-white hover:bg-slate-100 transition-colors border border-slate-200 text-slate-700 rounded-3xl px-4 text-xs">
+                            <i class="fa-solid fa-upload mr-1.5"></i> <span class="hidden md:inline">Restore</span>
+                        </button>
+                        <button onclick="resetAllData()" class="flex items-center gap-x-2 px-3 py-2 text-sm font-semibold bg-white hover:bg-red-50 transition-colors border border-slate-200 text-red-500 hover:text-red-600 rounded-3xl px-3.5 text-xs">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="max-w-screen-2xl mx-auto px-5 pt-5 pb-8">
+        <div class="flex flex-col md:flex-row md:items-center justify-between mb-5 px-1">
+            <div>
+                <h1 class="text-3xl font-extrabold tracking-tighter text-slate-800">Accounting Books</h1>
+                <p class="text-slate-500 text-sm mt-0.5">Paper Bag Manufacturing Unit • <span id="current-date"></span></p>
+            </div>
+            <button onclick="showDashboard()" class="mt-3 md:mt-0 px-4 flex items-center gap-x-2 py-[9px] text-xs bg-teal-700 hover:bg-teal-800 transition-colors text-white font-bold shadow-sm rounded-3xl px-5">
+                <i class="fa-solid fa-chart-line"></i>
+                <span class="font-semibold">Dashboard</span>
+            </button>
+        </div>
+        
+        <!-- Navigation -->
+        <div class="flex flex-wrap items-center gap-x-1.5 gap-y-1.5 mb-6 bg-white border border-slate-200 p-1.5 shadow-sm rounded-3xl w-fit">
+            <div onclick="showSection('dashboard')" class="nav-tab nav-item active cursor-pointer flex items-center gap-x-2 px-4 py-[7.5px] rounded-[2rem] text-sm font-semibold px-5" id="nav-dashboard">
+                <i class="fa-solid fa-tachometer-alt w-4"></i> <span>Dashboard</span>
+            </div>
+            <div onclick="showSection('cash')" class="nav-tab nav-item cursor-pointer flex items-center gap-x-2 px-4 py-[7.5px] rounded-[2rem] text-sm font-semibold px-5" id="nav-cash">
+                <i class="fa-solid fa-wallet w-4"></i> <span>Cash Book</span>
+            </div>
+            <div onclick="showSection('bank')" class="nav-tab nav-item cursor-pointer flex items-center gap-x-2 px-4 py-[7.5px] rounded-[2rem] text-sm font-semibold px-5" id="nav-bank">
+                <i class="fa-solid fa-university w-4"></i> <span>Bank Book</span>
+            </div>
+            <div onclick="showSection('purchases')" class="nav-tab nav-item cursor-pointer flex items-center gap-x-2 px-4 py-[7.5px] rounded-[2rem] text-sm font-semibold px-5" id="nav-purchases">
+                <i class="fa-solid fa-shopping-cart w-4"></i> <span>Purchase</span>
+            </div>
+            <div onclick="showSection('sales')" class="nav-tab nav-item cursor-pointer flex items-center gap-x-2 px-4 py-[7.5px] rounded-[2rem] text-sm font-semibold px-5" id="nav-sales">
+                <i class="fa-solid fa-file-invoice-dollar w-4"></i> <span>Sales</span>
+            </div>
+            <div onclick="showSection('stock')" class="nav-tab nav-item cursor-pointer flex items-center gap-x-2 px-4 py-[7.5px] rounded-[2rem] text-sm font-semibold px-5" id="nav-stock">
+                <i class="fa-solid fa-boxes w-4"></i> <span>Stock</span>
+            </div>
+            <div onclick="showSection('wages')" class="nav-tab nav-item cursor-pointer flex items-center gap-x-2 px-4 py-[7.5px] rounded-[2rem] text-sm font-semibold px-5" id="nav-wages">
+                <i class="fa-solid fa-users w-4"></i> <span>Wages</span>
+            </div>
+            <div onclick="showSection('reports')" class="nav-tab nav-item cursor-pointer flex items-center gap-x-2 px-4 py-[7.5px] rounded-[2rem] text-sm font-semibold px-5" id="nav-reports">
+                <i class="fa-solid fa-file-alt w-4"></i> <span>Reports</span>
+            </div>
+        </div>
+        
+        <!-- DASHBOARD -->
+        <div id="dashboard" class="section active">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+                <div class="stat-card bg-white border border-slate-200 p-5 rounded-3xl">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <div class="text-xs font-semibold text-teal-700">CASH BALANCE</div>
+                            <div id="dash-cash-balance" class="text-3xl font-extrabold text-emerald-700 mt-1">₹0</div>
+                        </div>
+                        <div class="w-10 h-10 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center">
+                            <i class="fa-solid fa-wallet fa-lg"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="stat-card bg-white border border-slate-200 p-5 rounded-3xl">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <div class="text-xs font-semibold text-blue-700">BANK BALANCE</div>
+                            <div id="dash-bank-balance" class="text-3xl font-extrabold text-blue-700 mt-1">₹0</div>
+                        </div>
+                        <div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center">
+                            <i class="fa-solid fa-university fa-lg"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="stat-card bg-white border border-slate-200 p-5 rounded-3xl">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <div class="text-xs font-semibold text-violet-700">THIS MONTH SALES</div>
+                            <div id="dash-sales-month" class="text-3xl font-extrabold text-violet-700 mt-1">₹0</div>
+                            <div class="text-xs">+ <span id="dash-sales-count">0</span> invoices</div>
+                        </div>
+                        <div class="w-10 h-10 bg-violet-100 text-violet-600 rounded-2xl flex items-center justify-center">
+                            <i class="fa-solid fa-file-invoice-dollar fa-lg"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="stat-card bg-white border border-slate-200 p-5 rounded-3xl">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <div class="text-xs font-semibold text-amber-700">PURCHASES (MONTH)</div>
+                            <div id="dash-purchase-month" class="text-3xl font-extrabold text-amber-700 mt-1">₹0</div>
+                        </div>
+                        <div class="w-10 h-10 bg-amber-100 text-amber-600 rounded-2xl flex items-center justify-center">
+                            <i class="fa-solid fa-shopping-cart fa-lg"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="stat-card bg-white border border-slate-200 p-5 rounded-3xl">
+                    <div>
+                        <div class="text-xs font-semibold text-teal-700">GST SUMMARY</div>
+                        <div class="flex justify-between mt-1">
+                            <div>
+                                <div class="text-xs">Collected</div>
+                                <div id="dash-gst-collected" class="font-extrabold text-lg">₹0</div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-xs">Paid</div>
+                                <div id="dash-gst-paid" class="font-semibold text-sm text-rose-600">₹0</div>
+                            </div>
+                        </div>
+                        <div class="text-xs mt-1">Net: <span id="dash-gst-net" class="font-extrabold">₹0</span></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+                <div class="lg:col-span-7 bg-white border border-slate-200 shadow-sm rounded-3xl p-5">
+                    <div class="flex items-center justify-between mb-3 px-1">
+                        <span class="font-bold text-slate-700">Recent Transactions</span>
+                    </div>
+                    <div id="recent-activity" class="space-y-1 text-sm"></div>
+                </div>
+                
+                <div class="lg:col-span-5 bg-white border border-slate-200 shadow-sm rounded-3xl p-5">
+                    <div class="flex items-center justify-between mb-3 px-1">
+                        <span class="font-bold text-slate-700">Production Snapshot</span>
+                    </div>
+                    <div class="grid grid-cols-3 gap-3">
+                        <div class="bg-slate-50 p-3 rounded-2xl text-center">
+                            <div class="text-xs font-medium text-slate-500">Today</div>
+                            <div id="prod-today-qty" class="font-extrabold text-2xl">0</div>
+                            <div class="text-xs text-teal-600">bags</div>
+                        </div>
+                        <div class="bg-slate-50 p-3 rounded-2xl text-center">
+                            <div class="text-xs font-medium text-slate-500">This Month</div>
+                            <div id="prod-month-qty" class="font-extrabold text-2xl">0</div>
+                            <div class="text-xs text-teal-600">bags</div>
+                        </div>
+                        <div class="bg-slate-50 p-3 rounded-2xl text-center">
+                            <div class="text-xs font-medium text-slate-500">Paper Used</div>
+                            <div id="prod-month-paper" class="font-extrabold text-xl">0</div>
+                            <div class="text-xs text-teal-600">kg</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- CASH BOOK -->
+        <div id="cash" class="section">
+            <div class="flex items-center justify-between mb-4 px-1">
+                <div>
+                    <h2 class="section-header text-slate-800">Cash Book</h2>
+                    <p class="text-sm text-slate-500">Daily cash inflows &amp; outflows</p>
+                </div>
+                <button onclick="showAddCashModal()" class="px-5 py-2.5 flex items-center gap-x-2 bg-emerald-600 hover:bg-emerald-700 transition-colors text-white font-bold text-sm shadow-sm rounded-3xl">
+                    <i class="fa-solid fa-plus"></i> <span>Add Cash Entry</span>
+                </button>
+            </div>
+            <div class="bg-white border border-slate-200 shadow-sm rounded-3xl p-5">
+                <div class="flex flex-wrap items-center gap-x-3 gap-y-3 mb-4">
+                    <input type="date" id="cash-from-date" onchange="filterCashTable()" class="text-sm border border-slate-300 rounded-2xl px-3 py-1.5">
+                    <input type="date" id="cash-to-date" onchange="filterCashTable()" class="text-sm border border-slate-300 rounded-2xl px-3 py-1.5">
+                    <select id="cash-type-filter" onchange="filterCashTable()" class="text-sm border border-slate-300 rounded-2xl px-3 py-[7px]">
+                        <option value="">All</option>
+                        <option value="In">Inflow</option>
+                        <option value="Out">Outflow</option>
+                    </select>
+                    <button onclick="clearCashFilters()" class="px-3 py-[6.5px] text-xs text-slate-600 hover:bg-slate-100 rounded-2xl px-4 border border-slate-200">Clear</button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full text-sm">
+                        <thead><tr class="border-b border-slate-100"><th class="text-left px-4 py-3 font-semibold text-xs text-slate-500">DATE</th><th class="text-left px-4 py-3 font-semibold text-xs text-slate-500">DESCRIPTION</th><th class="text-left px-4 py-3 font-semibold text-xs text-slate-500">REF</th><th class="text-center px-4 py-3 font-semibold text-xs text-slate-500">TYPE</th><th class="text-right px-4 py-3 font-semibold text-xs text-slate-500">AMOUNT</th><th class="px-2"></th></tr></thead>
+                        <tbody id="cash-table-body" class="divide-y divide-slate-100"></tbody>
+                    </table>
+                </div>
+                <div class="mt-4 px-1 flex items-center justify-between text-xs">
+                    <div><span id="cash-total-entries">0</span> entries</div>
+                    <div class="font-extrabold">Balance: <span id="cash-balance" class="money">₹0</span></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- BANK BOOK -->
+        <div id="bank" class="section">
+            <div class="flex items-center justify-between mb-4 px-1">
+                <div>
+                    <h2 class="section-header text-slate-800">Bank Book</h2>
+                </div>
+                <button onclick="showAddBankModal()" class="px-5 py-2.5 flex items-center gap-x-2 bg-blue-600 hover:bg-blue-700 transition-colors text-white font-bold text-sm shadow-sm rounded-3xl">
+                    <i class="fa-solid fa-plus"></i> <span>Add Bank Entry</span>
+                </button>
+            </div>
+            <div class="bg-white border border-slate-200 shadow-sm rounded-3xl p-5">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full text-sm">
+                        <thead><tr class="border-b border-slate-100"><th class="text-left px-4 py-3 font-semibold text-xs text-slate-500">DATE</th><th class="text-left px-4 py-3 font-semibold text-xs text-slate-500">DESCRIPTION</th><th class="text-left px-4 py-3 font-semibold text-xs text-slate-500">BANK / REF</th><th class="text-center px-4 py-3 font-semibold text-xs text-slate-500">TYPE</th><th class="text-right px-4 py-3 font-semibold text-xs text-slate-500">AMOUNT</th><th></th></tr></thead>
+                        <tbody id="bank-table-body" class="divide-y divide-slate-100"></tbody>
+                    </table>
+                </div>
+                <div class="mt-4 px-1 flex justify-between items-center text-xs">
+                    <div><span id="bank-total-entries">0</span> entries</div>
+                    <div class="font-extrabold">Balance: <span id="bank-balance" class="money">₹0</span></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- PURCHASE REGISTER -->
+        <div id="purchases" class="section">
+            <div class="flex items-center justify-between mb-4 px-1">
+                <div>
+                    <h2 class="section-header text-slate-800">Purchase Register</h2>
+                </div>
+                <button onclick="showAddPurchaseModal()" class="px-5 py-2.5 flex items-center gap-x-2 bg-amber-600 hover:bg-amber-700 transition-colors text-white font-bold text-sm shadow-sm rounded-3xl">
+                    <i class="fa-solid fa-plus"></i> <span>Add Purchase</span>
+                </button>
+            </div>
+            <div class="bg-white border border-slate-200 shadow-sm rounded-3xl p-5">
+                <div class="flex items-center gap-3 mb-4">
+                    <input id="purchase-search" type="text" onkeyup="filterPurchasesTable()" placeholder="Search invoice / supplier..." class="flex-1 text-sm border border-slate-300 px-4 py-[8.5px] rounded-3xl">
+                    <select id="purchase-gst-filter" onchange="filterPurchasesTable()" class="text-sm border border-slate-300 px-3 py-2 rounded-3xl">
+                        <option value="">All</option><option value="18">18%</option><option value="12">12%</option>
+                    </select>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full text-sm">
+                        <thead><tr class="border-b border-slate-100"><th class="px-4 py-3 text-xs font-semibold text-slate-500 text-left">DATE</th><th class="px-4 py-3 text-xs font-semibold text-slate-500 text-left">INVOICE</th><th class="px-4 py-3 text-xs font-semibold text-slate-500 text-left">SUPPLIER</th><th class="px-4 py-3 text-xs font-semibold text-slate-500 text-right">TAXABLE</th><th class="px-4 py-3 text-xs font-semibold text-slate-500 text-center">GST</th><th class="px-4 py-3 text-xs font-semibold text-slate-500 text-right">TOTAL</th><th></th></tr></thead>
+                        <tbody id="purchase-table-body" class="divide-y divide-slate-100"></tbody>
+                    </table>
+                </div>
+                <div class="mt-4 px-2 text-xs flex justify-between"><div><span id="purchase-total-entries">0</span> entries</div><div>Taxable: <span id="purchase-taxable-total" class="font-bold">₹0</span> | GST: <span id="purchase-gst-total" class="font-bold">₹0</span> | Grand: <span id="purchase-grand-total" class="font-bold text-amber-700">₹0</span></div></div>
+            </div>
+        </div>
+        
+        <!-- SALES REGISTER -->
+        <div id="sales" class="section">
+            <div class="flex items-center justify-between mb-4 px-1">
+                <div>
+                    <h2 class="section-header text-slate-800">Sales Register</h2>
+                </div>
+                <button onclick="showAddSalesModal()" class="px-5 py-2.5 flex items-center gap-x-2 bg-violet-600 hover:bg-violet-700 transition-colors text-white font-bold text-sm shadow-sm rounded-3xl">
+                    <i class="fa-solid fa-plus"></i> <span>Add Sales Invoice</span>
+                </button>
+            </div>
+            <div class="bg-white border border-slate-200 shadow-sm rounded-3xl p-5">
+                <div class="flex mb-4 gap-3">
+                    <input id="sales-search" type="text" onkeyup="filterSalesTable()" placeholder="Search customer / invoice..." class="flex-1 border border-slate-300 px-4 py-2 text-sm rounded-3xl">
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full text-sm">
+                        <thead><tr class="border-b border-slate-100"><th class="px-4 py-3 text-xs font-semibold text-slate-500 text-left">DATE</th><th class="px-4 py-3 text-xs font-semibold text-slate-500 text-left">INVOICE</th><th class="px-4 py-3 text-xs font-semibold text-slate-500 text-left">CUSTOMER</th><th class="px-4 py-3 text-xs font-semibold text-slate-500 text-left">SIZE</th><th class="px-4 py-3 text-xs font-semibold text-slate-500 text-right">TOTAL</th><th></th></tr></thead>
+                        <tbody id="sales-table-body" class="divide-y divide-slate-100"></tbody>
+                    </table>
+                </div>
+                <div class="mt-4 px-2 text-xs flex justify-between"><div><span id="sales-total-entries">0</span> invoices</div><div>Taxable: <span id="sales-taxable-total" class="font-bold">₹0</span> | GST: <span id="sales-gst-total" class="font-bold">₹0</span> | Total: <span id="sales-grand-total" class="font-bold text-violet-700">₹0</span></div></div>
+            </div>
+        </div>
+        
+        <!-- STOCK REGISTER -->
+        <div id="stock" class="section">
+            <div class="flex items-center justify-between mb-4 px-1">
+                <div>
+                    <h2 class="section-header text-slate-800">Stock Register</h2>
+                </div>
+                <button onclick="showAddProductionModal()" class="px-4 py-2 flex items-center gap-x-2 bg-teal-700 hover:bg-teal-800 text-white font-bold shadow-sm transition-colors rounded-3xl px-5 text-sm">
+                    <i class="fa-solid fa-plus"></i> <span>Add Production</span>
+                </button>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+                <div class="lg:col-span-5 bg-white border border-slate-200 rounded-3xl p-5 shadow-sm">
+                    <div class="flex items-center mb-3 justify-between">
+                        <span class="font-bold text-slate-700">Raw Material Stock</span>
+                        <button onclick="showAddRawPurchaseModal()" class="text-xs px-3 py-1 flex items-center gap-x-1.5 bg-teal-700 text-white hover:bg-teal-800 transition-colors rounded-3xl px-3 text-xs font-bold py-[5px]">
+                            <i class="fa-solid fa-plus fa-sm"></i> <span>Add Raw</span>
+                        </button>
+                    </div>
+                    <table class="w-full text-sm">
+                        <thead><tr><th class="text-left px-2 py-1 text-xs font-semibold text-slate-500">Item</th><th class="text-right px-2 py-1 text-xs font-semibold text-slate-500">Purchased</th><th class="text-right px-2 py-1 text-xs font-semibold text-slate-500">Consumed</th><th class="text-right px-2 py-1 text-xs font-semibold text-slate-500">Balance</th></tr></thead>
+                        <tbody id="raw-stock-body"></tbody>
+                    </table>
+                    <div class="px-1 mt-3 text-xs">Total paper in stock: <span id="raw-stock-total" class="font-extrabold">0 kg</span></div>
+                </div>
+                
+                <div class="lg:col-span-7 bg-white border border-slate-200 rounded-3xl p-5 shadow-sm">
+                    <div class="flex justify-between items-center mb-3 px-1">
+                        <span class="font-bold text-slate-700">Daily Production Log</span>
+                        <button onclick="exportProductionCSV()" class="px-3 flex items-center py-1 text-xs bg-white hover:bg-slate-100 border border-slate-200 transition-colors rounded-2xl px-3 font-bold text-teal-700 text-xs">
+                            <i class="fa-solid fa-download mr-1.5"></i> CSV
+                        </button>
+                    </div>
+                    <div class="overflow-x-auto max-h-[260px]">
+                        <table class="min-w-full text-sm">
+                            <thead><tr class="border-b border-slate-200"><th class="text-left px-3 py-2 text-xs font-semibold text-slate-500">DATE</th><th class="text-left px-3 py-2 text-xs font-semibold text-slate-500">SIZE</th><th class="text-center px-3 py-2 text-xs font-semibold text-slate-500">BAGS</th><th class="text-center px-3 py-2 text-xs font-semibold text-slate-500">PAPER (kg)</th><th></th></tr></thead>
+                            <tbody id="production-table-body" class="divide-y"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- WAGES REGISTER -->
+        <div id="wages" class="section">
+            <div class="flex items-center justify-between mb-4 px-1">
+                <div>
+                    <h2 class="section-header text-slate-800">Wages Register</h2>
+                </div>
+                <button onclick="showAddWagesModal()" class="px-5 py-2.5 flex items-center gap-x-2 bg-rose-600 hover:bg-rose-700 transition-colors text-white font-bold text-sm shadow-sm rounded-3xl">
+                    <i class="fa-solid fa-plus"></i> <span>Add Wages Entry</span>
+                </button>
+            </div>
+            <div class="bg-white border border-slate-200 shadow-sm rounded-3xl p-5">
+                <input id="wages-search" type="text" onkeyup="filterWagesTable()" placeholder="Search employee..." class="mb-3 w-full px-4 py-2 text-sm border border-slate-300 rounded-3xl">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full text-sm">
+                        <thead><tr class="border-b border-slate-100"><th class="px-4 py-3 text-xs text-left font-semibold text-slate-500">DATE</th><th class="px-4 py-3 text-xs text-left font-semibold text-slate-500">EMPLOYEE</th><th class="px-4 py-3 text-xs text-left font-semibold text-slate-500">PERIOD</th><th class="px-4 py-3 text-xs text-right font-semibold text-slate-500">AMOUNT</th><th></th></tr></thead>
+                        <tbody id="wages-table-body" class="divide-y divide-slate-100"></tbody>
+                    </table>
+                </div>
+                <div class="mt-4 px-2 text-xs flex justify-between"><div>Total wages: <span id="wages-total" class="font-extrabold text-rose-700">₹0</span></div><div><span id="wages-count">0</span> payments</div></div>
+            </div>
+        </div>
+        
+        <!-- REPORTS -->
+        <div id="reports" class="section">
+            <div class="flex items-center justify-between mb-4 px-1">
+                <div>
+                    <h2 class="section-header text-slate-800">Reports &amp; Summaries</h2>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                <div class="bg-white border border-slate-200 shadow-sm rounded-3xl p-5">
+                    <h4 class="font-extrabold mb-3">GST Summary</h4>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="bg-slate-50 p-3 rounded-2xl">
+                            <div class="text-xs font-semibold text-teal-700">Output GST (Sales)</div>
+                            <div id="report-gst-output" class="font-extrabold text-xl">₹0</div>
+                        </div>
+                        <div class="bg-slate-50 p-3 rounded-2xl">
+                            <div class="text-xs font-semibold text-rose-700">Input GST (Purchases)</div>
+                            <div id="report-gst-input" class="font-extrabold text-xl">₹0</div>
+                        </div>
+                    </div>
+                    <div class="mt-3 p-3 bg-teal-50 border border-teal-100 rounded-2xl">
+                        <div class="text-xs font-semibold">Net GST</div>
+                        <div id="report-gst-net" class="font-extrabold text-2xl text-teal-700">₹0</div>
+                    </div>
+                    <button onclick="exportGSTReport()" class="mt-4 w-full text-xs px-4 py-2 bg-teal-700 hover:bg-teal-800 text-white font-bold rounded-3xl">Export GST Report (CSV)</button>
+                </div>
+                
+                <div class="bg-white border border-slate-200 shadow-sm rounded-3xl p-5">
+                    <h4 class="font-extrabold mb-3">Quick Exports</h4>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button onclick="exportCashCSV()" class="p-3 border border-slate-200 hover:bg-emerald-50 transition-colors rounded-2xl text-xs font-bold">Cash Book CSV</button>
+                        <button onclick="exportBankCSV()" class="p-3 border border-slate-200 hover:bg-blue-50 transition-colors rounded-2xl text-xs font-bold">Bank Book CSV</button>
+                        <button onclick="exportPurchasesCSV()" class="p-3 border border-slate-200 hover:bg-amber-50 transition-colors rounded-2xl text-xs font-bold">Purchase Register</button>
+                        <button onclick="exportSalesCSV()" class="p-3 border border-slate-200 hover:bg-violet-50 transition-colors rounded-2xl text-xs font-bold">Sales Register</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- All Modals -->
+    <!-- Cash Modal -->
+    <div id="modal-cash" onclick="if (event.target.id === 'modal-cash') hideModal('modal-cash')" class="hidden fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-[80]">
+        <div onclick="event.stopImmediatePropagation()" class="bg-white rounded-3xl w-full max-w-md mx-4 shadow-xl">
+            <div class="px-5 pt-5 pb-1">
+                <h3 class="font-extrabold text-xl">Add Cash Entry</h3>
+                <div class="mt-5 space-y-4">
+                    <div><label class="text-xs font-bold text-slate-600 block mb-1">Date</label><input type="date" id="cash-date" class="border px-3 py-2.5 w-full rounded-2xl text-sm"></div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div><label class="text-xs font-bold text-slate-600 block mb-1">Type</label><select id="cash-type" class="border px-3 py-[9.5px] w-full rounded-2xl text-sm"><option value="In">Inflow (+)</option><option value="Out">Outflow (−)</option></select></div>
+                        <div><label class="text-xs font-bold text-slate-600 block mb-1">Amount (₹)</label><input type="number" id="cash-amount" class="border px-3 py-2.5 w-full rounded-2xl text-sm" step="0.01"></div>
+                    </div>
+                    <div><label class="text-xs font-bold text-slate-600 block mb-1">Description</label><input type="text" id="cash-desc" class="border px-3 py-2.5 w-full rounded-2xl text-sm" placeholder="Cash sales / expenses"></div>
+                    <div><label class="text-xs font-bold text-slate-600 block mb-1">Ref / Party</label><input type="text" id="cash-ref" class="border px-3 py-2.5 w-full rounded-2xl text-sm" placeholder="Customer or bill #"></div>
+                </div>
+            </div>
+            <div class="px-5 py-4 flex justify-end gap-x-3 bg-slate-50 rounded-b-3xl">
+                <button onclick="hideModal('modal-cash')" class="px-5 py-2 text-sm font-semibold text-slate-600">Cancel</button>
+                <button onclick="addCashEntry()" class="px-6 py-2 bg-emerald-600 text-white font-bold text-sm rounded-3xl">Save Entry</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bank Modal -->
+    <div id="modal-bank" onclick="if (event.target.id === 'modal-bank') hideModal('modal-bank')" class="hidden fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-[80]">
+        <div onclick="event.stopImmediatePropagation()" class="bg-white rounded-3xl w-full max-w-md mx-4 shadow-xl">
+            <div class="px-5 pt-5 pb-1">
+                <h3 class="font-extrabold text-xl">Add Bank Transaction</h3>
+                <div class="mt-5 space-y-4">
+                    <div><label class="text-xs font-bold text-slate-600 block mb-1">Date</label><input type="date" id="bank-date" class="border px-3 py-2.5 w-full rounded-2xl text-sm"></div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div><label class="text-xs font-bold text-slate-600 block mb-1">Type</label><select id="bank-type" class="border px-3 py-[9.5px] w-full rounded-2xl text-sm"><option value="Credit">Credit (Deposit)</option><option value="Debit">Debit (Withdrawal)</option></select></div>
+                        <div><label class="text-xs font-bold text-slate-600 block mb-1">Amount (₹)</label><input type="number" id="bank-amount" class="border px-3 py-2.5 w-full rounded-2xl text-sm" step="0.01"></div>
+                    </div>
+                    <div><label class="text-xs font-bold text-slate-600 block mb-1">Description</label><input type="text" id="bank-desc" class="border px-3 py-2.5 w-full rounded-2xl text-sm"></div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div><label class="text-xs font-bold text-slate-600 block mb-1">Bank</label><input type="text" id="bank-name" value="SBI" class="border px-3 py-2.5 w-full rounded-2xl text-sm"></div>
+                        <div><label class="text-xs font-bold text-slate-600 block mb-1">Reference</label><input type="text" id="bank-ref" class="border px-3 py-2.5 w-full rounded-2xl text-sm"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="px-5 py-4 flex justify-end gap-x-3 bg-slate-50 rounded-b-3xl">
+                <button onclick="hideModal('modal-bank')" class="px-5 py-2 text-sm font-semibold text-slate-600">Cancel</button>
+                <button onclick="addBankEntry()" class="px-6 py-2 bg-blue-600 text-white font-bold text-sm rounded-3xl">Save</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Purchase Modal -->
+    <div id="modal-purchase" onclick="if (event.target.id === 'modal-purchase') hideModal('modal-purchase')" class="hidden fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-[80]">
+        <div onclick="event.stopImmediatePropagation()" class="bg-white rounded-3xl w-full max-w-lg mx-4 shadow-xl">
+            <div class="px-5 pt-5 pb-2">
+                <h3 class="font-extrabold text-xl">Add Purchase Entry</h3>
+                <div class="mt-4 grid grid-cols-2 gap-3">
+                    <div><label class="text-xs font-bold text-slate-600 block mb-1">Date</label><input type="date" id="purchase-date" class="border px-3 py-2.5 w-full rounded-2xl text-sm"></div>
+                    <div><label class="text-xs font-bold text-slate-600 block mb-1">Invoice #</label><input type="text" id="purchase-invoice" class="border px-3 py-2.5 w-full rounded-2xl text-sm"></div>
+                </div>
+                <div class="mt-3"><label class="text-xs font-bold text-slate-600 block mb-1">Supplier</label><input type="text" id="purchase-supplier" class="border px-3 py-2.5 w-full rounded-2xl text-sm" placeholder="Kraft Paper Industries"></div>
+                <div class="grid grid-cols-3 gap-3 mt-3">
+                    <div><label class="text-xs font-bold text-slate-600 block mb-1">Item</label><input type="text" id="purchase-item" class="border px-3 py-2.5 w-full rounded-2xl text-sm" value="Kraft Paper"></div>
+                    <div><label class="text-xs font-bold text-slate-600 block mb-1">Qty</label><input type="number" id="purchase-qty" class="border px-3 py-2.5 w-full rounded-2xl text-sm"></div>
+                    <div><label class="text-xs font-bold text-slate-600 block mb-1">Unit</label><input type="text" id="purchase-unit" value="kg" class="border px-3 py-2.5 w-full rounded-2xl text-sm"></div>
+                </div>
+                <div class="grid grid-cols-2 gap-3 mt-3">
+                    <div><label class="text-xs font-bold text-slate-600 block mb-1">Taxable Amount (₹)</label><input type="number" id="purchase-taxable" oninput="calculatePurchaseGST()" class="border px-3 py-2.5 w-full rounded-2xl text-sm"></div>
+                    <div><label class="text-xs font-bold text-slate-600 block mb-1">GST %</label><select id="purchase-gst-rate" onchange="calculatePurchaseGST()" class="border px-3 py-[9.5px] w-full rounded-2xl text-sm"><option value="18">18%</option><option value="12">12%</option><option value="5">5%</option></select></div>
+                </div>
+                <div class="grid grid-cols-3 gap-3 mt-3">
+                    <div><label class="text-xs font-bold text-slate-600 block mb-1">CGST</label><input type="number" id="purchase-cgst" readonly class="bg-slate-100 border px-3 py-2 w-full rounded-2xl text-sm"></div>
+                    <div><label class="text-xs font-bold text-slate-600 block mb-1">SGST</label><input type="number" id="purchase-sgst" readonly class="bg-slate-100 border px-3 py-2 w-full rounded-2xl text-sm"></div>
+                    <div><label class="text-xs font-bold text-slate-600 block mb-1">Total</label><input type="number" id="purchase-total" readonly class="bg-slate-100 border px-3 py-2 w-full rounded-2xl text-sm font-bold"></div>
+                </div>
+            </div>
+            <div class="px-5 py-4 flex justify-end gap-x-3 bg-slate-50 rounded-b-3xl">
+                <button onclick="hideModal('modal-purchase')" class="px-5 py-2 text-sm font-semibold text-slate-600">Cancel</button>
+                <button onclick="addPurchaseEntry()" class="px-6 py-2 bg-amber-600 text-white font-bold text-sm rounded-3xl">Save Purchase</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Sales Modal -->
+    <div id="modal-sales" onclick="if (event.target.id === 'modal-sales') hideModal('modal-sales')" class="hidden fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-[80]">
+        <div onclick="event.stopImmediatePropagation()" class="bg-white rounded-3xl w-full max-w-lg mx-4 shadow-xl">
+            <div class="px-5 pt-5 pb-1">
+                <h3 class="font-extrabold text-xl">Add Sales Invoice</h3>
+                <div class="mt-4 grid grid-cols-2 gap-3">
+                    <div><label class="text-xs font-bold text-slate-600 block mb-1">Date</label><input type="date" id="sales-date" class="border px-3 py-2.5 w-full rounded-2xl text-sm"></div>
+                    <div><label class="text-xs font-bold text-slate-600 block mb-1">Invoice #</label><input type="text" id="sales-invoice" class="border px-3 py-2.5 w-full rounded-2xl text-sm"></div>
+                </div>
+                <div><label class="text-xs font-bold text-slate-600 block mb-1 mt-3">Customer</label><input type="text" id="sales-customer" class="border px-3 py-2.5 w-full rounded-2xl text-sm"></div>
+                <div class="mt-3 grid grid-cols-2 gap-3">
+                    <div><label class="text-xs font-bold text-slate-600 block mb-1">Bag Size</label><select id="sales-size" class="border px-3 py-[9.5px] w-full rounded-2xl text-sm"><option value="10x12">10 × 12 inch</option><option value="12x16">12 × 16 inch</option><option value="14x18">14 × 18 inch</option><option value="18x22">18 × 22 inch</option></select></div>
+                    <div><label class="text-xs font-bold text-slate-600 block mb-1">Quantity (bags)</label><input type="number" id="sales-qty" oninput="calculateSalesGST()" class="border px-3 py-2.5 w-full rounded-2xl text-sm"></div>
+                </div>
+                <div class="grid grid-cols-2 gap-3 mt-3">
+                    <div><label class="text-xs font-bold text-slate-600 block mb-1">Rate per 1000 bags (₹)</label><input type="number" id="sales-rate" oninput="calculateSalesGST()" class="border px-3 py-2.5 w-full rounded-2xl text-sm" value="450"></div>
+                    <div><label class="text-xs font-bold text-slate-600 block mb-1">GST %</label><select id="sales-gst-rate" onchange="calculateSalesGST()" class="border px-3 py-[9.5px] w-full rounded-2xl text-sm"><option value="18">18%</option><option value="12">12%</option></select></div>
+                </div>
+                <div class="grid grid-cols-3 gap-3 mt-3">
+                    <div><label class="text-xs font-bold text-slate-600 block mb-1">Taxable</label><input type="number" id="sales-taxable" readonly class="bg-slate-100 border px-3 py-2 w-full rounded-2xl text-sm"></div>
+                    <div><label class="text-xs font-bold text-slate-600 block mb-1">GST</label><input type="number" id="sales-gst" readonly class="bg-slate-100 border px-3 py-2 w-full rounded-2xl text-sm"></div>
+                    <div><label class="text-xs font-bold text-slate-600 block mb-1">Total</label><input type="number" id="sales-total" readonly class="bg-teal-50 border px-3 py-2 w-full rounded-2xl text-sm font-bold"></div>
+                </div>
+            </div>
+            <div class="px-5 py-4 flex justify-end gap-x-3 bg-slate-50 rounded-b-3xl">
+                <button onclick="hideModal('modal-sales')" class="px-5 py-2 text-sm font-semibold text-slate-600">Cancel</button>
+                <button onclick="addSalesEntry()" class="px-6 py-2 bg-violet-600 text-white font-bold text-sm rounded-3xl">Save Invoice</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Production Modal -->
+    <div id="modal-production" onclick="if (event.target.id === 'modal-production') hideModal('modal-production')" class="hidden fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-[80]">
+        <div onclick="event.stopImmediatePropagation()" class="bg-white rounded-3xl w-full max-w-md mx-4 shadow-xl">
+            <div class="px-5 pt-5 pb-1">
+                <h3 class="font-extrabold text-xl">Add Daily Production</h3>
+                <div class="mt-4 space-y-4">
+                    <div class="grid grid-cols-2 gap-3">
+                        <div><label class="text-xs font-bold text-slate-600 block mb-1">Date</label><input type="date" id="prod-date" class="border px-3 py-2.5 w-full rounded-2xl text-sm"></div>
+                        <div><label class="text-xs font-bold text-slate-600 block mb-1">Bag Size</label><select id="prod-size" class="border px-3 py-[9.5px] w-full rounded-2xl text-sm"><option value="10x12">10 × 12 inch</option><option value="12x16">12 × 16 inch</option><option value="14x18">14 × 18 inch</option><option value="18x22">18 × 22 inch</option></select></div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div><label class="text-xs font-bold text-slate-600 block mb-1">Quantity (bags)</label><input type="number" id="prod-qty" class="border px-3 py-2.5 w-full rounded-2xl text-sm"></div>
+                        <div><label class="text-xs font-bold text-slate-600 block mb-1">Paper Used (kg)</label><input type="number" id="prod-paper" class="border px-3 py-2.5 w-full rounded-2xl text-sm"></div>
+                    </div>
+                    <div><label class="text-xs font-bold text-slate-600 block mb-1">Remarks</label><input type="text" id="prod-remarks" class="border px-3 py-2.5 w-full rounded-2xl text-sm"></div>
+                </div>
+            </div>
+            <div class="px-5 py-4 flex justify-end gap-x-3 bg-slate-50 rounded-b-3xl">
+                <button onclick="hideModal('modal-production')" class="px-5 py-2 text-sm font-semibold text-slate-600">Cancel</button>
+                <button onclick="addProductionEntry()" class="px-6 py-2 bg-teal-700 text-white font-bold text-sm rounded-3xl">Save Production</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Wages Modal -->
+    <div id="modal-wages" onclick="if (event.target.id === 'modal-wages') hideModal('modal-wages')" class="hidden fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-[80]">
+        <div onclick="event.stopImmediatePropagation()" class="bg-white rounded-3xl w-full max-w-md mx-4 shadow-xl">
+            <div class="px-5 pt-5 pb-1">
+                <h3 class="font-extrabold text-xl">Add Wages / Salary Payment</h3>
+                <div class="mt-4 space-y-4">
+                    <div><label class="text-xs font-bold text-slate-600 block mb-1">Employee Name</label><input type="text" id="wage-employee" class="border px-3 py-2.5 w-full rounded-2xl text-sm"></div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div><label class="text-xs font-bold text-slate-600 block mb-1">Payment Date</label><input type="date" id="wage-date" class="border px-3 py-2.5 w-full rounded-2xl text-sm"></div>
+                        <div><label class="text-xs font-bold text-slate-600 block mb-1">Period</label><input type="text" id="wage-period" class="border px-3 py-2.5 w-full rounded-2xl text-sm" value="Jan 2026"></div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div><label class="text-xs font-bold text-slate-600 block mb-1">Amount (₹)</label><input type="number" id="wage-amount" class="border px-3 py-2.5 w-full rounded-2xl text-sm"></div>
+                        <div><label class="text-xs font-bold text-slate-600 block mb-1">Ref / Mode</label><input type="text" id="wage-ref" class="border px-3 py-2.5 w-full rounded-2xl text-sm" value="Bank transfer"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="px-5 py-4 flex justify-end gap-x-3 bg-slate-50 rounded-b-3xl">
+                <button onclick="hideModal('modal-wages')" class="px-5 py-2 text-sm font-semibold text-slate-600">Cancel</button>
+                <button onclick="addWagesEntry()" class="px-6 py-2 bg-rose-600 text-white font-bold text-sm rounded-3xl">Save Wages</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Settings Modal -->
+    <div id="modal-settings" onclick="if (event.target.id === 'modal-settings') hideModal('modal-settings')" class="hidden fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-[80]">
+        <div onclick="event.stopImmediatePropagation()" class="bg-white rounded-3xl w-full max-w-md mx-4 shadow-xl">
+            <div class="px-5 pt-5 pb-1">
+                <h3 class="font-extrabold text-xl">Company Settings</h3>
+                <div class="mt-4 space-y-4">
+                    <div><label class="text-xs font-bold text-slate-600 block mb-1">Company Name</label><input type="text" id="setting-company" class="border px-3 py-2.5 w-full rounded-2xl text-sm"></div>
+                    <div><label class="text-xs font-bold text-slate-600 block mb-1">GSTIN</label><input type="text" id="setting-gstin" class="border px-3 py-2.5 w-full rounded-2xl text-sm"></div>
+                    <div><label class="text-xs font-bold text-slate-600 block mb-1">Address</label><textarea id="setting-address" rows="2" class="border px-3 py-2.5 w-full rounded-2xl text-sm"></textarea></div>
+                    <div><label class="text-xs font-bold text-slate-600 block mb-1">Default GST %</label><select id="setting-default-gst" class="border px-3 py-[9.5px] w-full rounded-2xl text-sm"><option value="18">18%</option><option value="12">12%</option></select></div>
+                </div>
+            </div>
+            <div class="px-5 py-4 flex justify-end gap-x-3 bg-slate-50 rounded-b-3xl">
+                <button onclick="hideModal('modal-settings')" class="px-5 py-2 text-sm font-semibold text-slate-600">Cancel</button>
+                <button onclick="saveSettings()" class="px-6 py-2 bg-teal-700 text-white font-bold text-sm rounded-3xl">Save Settings</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let data = {cash:[], bank:[], purchases:[], sales:[], productions:[], wages:[], settings: {companyName: "Shree Paper Bags", gstin: "27AABPS1234A1Z5", defaultGST: "18"}};
+        
+        function loadData() {
+            const saved = localStorage.getItem('paperbag_accounting');
+            if (saved) data = JSON.parse(saved);
+            else loadSampleData();
+            updateHeader();
+        }
+        
+        function saveData() { localStorage.setItem('paperbag_accounting', JSON.stringify(data)); }
+        
+        function updateHeader() {
+            document.getElementById('header-company-name').innerText = data.settings.companyName || "Shree Paper Bags";
+            document.getElementById('header-gstin').innerText = "GSTIN: " + (data.settings.gstin || "");
+        }
+        
+        function loadSampleData() {
+            const today = new Date().toISOString().split('T')[0];
+            data.cash = [{id: Date.now(), date: today, type: "In", amount: 12500, desc: "Daily cash sales", ref: "Counter"}];
+            data.bank = [{id: Date.now()+1, date: today, type: "Credit", amount: 48000, desc: "Invoice payment received", bank: "SBI", ref: "NEFT-23412"}];
+            data.purchases = [{id: Date.now()+2, date: today, invoice: "INV-KP-1023", supplier: "Kraft Paper Industries", item: "Kraft Paper Rolls", qty: 1200, unit: "kg", taxable: 48000, gstRate: 18, cgst: 4320, sgst: 4320, total: 56640}];
+            data.sales = [{id: Date.now()+3, date: today, invoice: "INV-S-001", customer: "Metro Packaging", size: "10x12", qty: 1500, rate: 380, taxable: 57000, gstRate: 18, gstAmount: 10260, total: 67260}];
+            data.productions = [{id: Date.now()+4, date: today, size: "10x12", qty: 2800, paperUsed: 140, remarks: "Kraft 120gsm"}];
+            data.wages = [{id: Date.now()+5, date: today, employee: "Ramesh Kumar", period: "Jan 2026", amount: 18500, ref: "Bank transfer"}];
+            saveData();
+        }
+        
+        function formatMoney(amount) {
+            return "₹" + (parseFloat(amount) || 0).toLocaleString('en-IN');
+        }
+        
+        function setCurrentDate() {
+            const d = new Date();
+            document.getElementById('current-date').innerHTML = d.toLocaleDateString('en-IN', {day: 'numeric', month: 'long', year: 'numeric'});
+        }
+        
+        function showSection(section) {
+            document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            document.getElementById(section).classList.add('active');
+            const nav = document.getElementById('nav-' + section);
+            if (nav) nav.classList.add('active');
+            
+            if (section === 'cash') renderCashTable();
+            else if (section === 'bank') renderBankTable();
+            else if (section === 'purchases') renderPurchasesTable();
+            else if (section === 'sales') renderSalesTable();
+            else if (section === 'stock') renderStockData();
+            else if (section === 'wages') renderWagesTable();
+            else if (section === 'reports') renderReports();
+            else if (section === 'dashboard') renderDashboard();
+        }
+        
+        function showDashboard() { showSection('dashboard'); }
+        
+        function renderDashboard() {
+            let cashBal = 0; data.cash.forEach(e => cashBal += e.type === 'In' ? e.amount : -e.amount);
+            document.getElementById('dash-cash-balance').innerHTML = formatMoney(cashBal);
+            
+            let bankBal = 0; data.bank.forEach(e => bankBal += e.type === 'Credit' ? e.amount : -e.amount);
+            document.getElementById('dash-bank-balance').innerHTML = formatMoney(bankBal);
+            
+            const thisMonth = new Date().toISOString().slice(0,7);
+            const monthSales = data.sales.filter(s => s.date && s.date.startsWith(thisMonth));
+            const totalMonthSales = monthSales.reduce((sum, s) => sum + (s.total || 0), 0);
+            document.getElementById('dash-sales-month').innerHTML = formatMoney(totalMonthSales);
+            document.getElementById('dash-sales-count').innerHTML = monthSales.length;
+            
+            const monthPurchases = data.purchases.filter(p => p.date && p.date.startsWith(thisMonth));
+            const totalMonthPurchases = monthPurchases.reduce((sum, p) => sum + (p.total || 0), 0);
+            document.getElementById('dash-purchase-month').innerHTML = formatMoney(totalMonthPurchases);
+            
+            const gstOut = data.sales.reduce((sum, s) => sum + (s.gstAmount || 0), 0);
+            const gstIn = data.purchases.reduce((sum, p) => sum + ((p.cgst || 0) + (p.sgst || 0)), 0);
+            document.getElementById('dash-gst-collected').innerHTML = formatMoney(gstOut);
+            document.getElementById('dash-gst-paid').innerHTML = formatMoney(gstIn);
+            document.getElementById('dash-gst-net').innerHTML = formatMoney(gstOut - gstIn);
+            
+            renderRecentActivity();
+            renderProductionSnapshot();
+        }
+        
+        function renderRecentActivity() {
+            const container = document.getElementById('recent-activity');
+            container.innerHTML = '';
+            let all = [];
+            data.cash.slice(0,3).forEach(e => all.push({date: e.date, desc: e.desc, amount: e.amount, sign: e.type === 'In' ? '+' : '-'}));
+            data.sales.slice(0,2).forEach(e => all.push({date: e.date, desc: 'Sale: ' + e.customer, amount: e.total, sign: '+'}));
+            all.sort((a, b) => new Date(b.date) - new Date(a.date));
+            all.slice(0, 5).forEach(item => {
+                const div = document.createElement('div');
+                div.className = `flex justify-between px-2 py-[3px] text-xs rounded-xl hover:bg-slate-50`;
+                div.innerHTML = `<div>${item.date} • ${item.desc}</div><div class="font-extrabold ${item.sign === '+' ? 'text-emerald-700' : 'text-rose-600'}">${item.sign} ${formatMoney(item.amount)}</div>`;
+                container.appendChild(div);
+            });
+        }
+        
+        function renderProductionSnapshot() {
+            const today = new Date().toISOString().split('T')[0];
+            const thisMonth = today.slice(0, 7);
+            let todayQty = 0, monthQty = 0, monthPaper = 0;
+            data.productions.forEach(p => {
+                if (p.date === today) todayQty += p.qty || 0;
+                if (p.date && p.date.startsWith(thisMonth)) {
+                    monthQty += p.qty || 0;
+                    monthPaper += p.paperUsed || 0;
+                }
+            });
+            document.getElementById('prod-today-qty').innerHTML = todayQty;
+            document.getElementById('prod-month-qty').innerHTML = monthQty;
+            document.getElementById('prod-month-paper').innerHTML = monthPaper;
+        }
+        
+        function renderCashTable(filtered = null) {
+            const tbody = document.getElementById('cash-table-body');
+            tbody.innerHTML = '';
+            let entries = filtered || [...data.cash];
+            entries.sort((a, b) => new Date(b.date) - new Date(a.date));
+            let balance = 0;
+            if (entries.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="px-4 py-6 text-center text-xs text-slate-400">No entries found</td></tr>`;
+                document.getElementById('cash-balance').innerHTML = formatMoney(0);
+                return;
+            }
+            entries.forEach(entry => {
+                const amt = parseFloat(entry.amount) || 0;
+                if (entry.type === 'In') balance += amt; else balance -= amt;
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="px-4 py-[9px] text-xs font-medium">${entry.date}</td>
+                    <td class="px-4 py-[9px] text-xs">${entry.desc || ''}</td>
+                    <td class="px-4 py-[9px] text-xs text-slate-500">${entry.ref || ''}</td>
+                    <td class="px-4 py-[9px] text-center"><span class="px-2.5 py-0.5 text-xs font-bold rounded-full ${entry.type === 'In' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}">${entry.type}</span></td>
+                    <td class="px-4 py-[9px] text-right font-extrabold ${entry.type === 'In' ? 'text-emerald-700' : 'text-rose-700'}">${formatMoney(amt)}</td>
+                    <td class="px-2"><button onclick="deleteCashEntry(${entry.id})" class="text-red-400 hover:text-red-600 text-xs">×</button></td>
+                `;
+                tbody.appendChild(row);
+            });
+            document.getElementById('cash-balance').innerHTML = formatMoney(balance);
+            document.getElementById('cash-total-entries').innerHTML = entries.length;
+        }
+        
+        function filterCashTable() {
+            const from = document.getElementById('cash-from-date').value;
+            const to = document.getElementById('cash-to-date').value;
+            const type = document.getElementById('cash-type-filter').value;
+            const filtered = data.cash.filter(e => (!from || e.date >= from) && (!to || e.date <= to) && (!type || e.type === type));
+            renderCashTable(filtered);
+        }
+        
+        function clearCashFilters() {
+            document.getElementById('cash-from-date').value = '';
+            document.getElementById('cash-to-date').value = '';
+            document.getElementById('cash-type-filter').value = '';
+            renderCashTable();
+        }
+        
+        function showAddCashModal() {
+            const modal = document.getElementById('modal-cash');
+            modal.classList.remove('hidden'); modal.classList.add('flex');
+            document.getElementById('cash-date').value = new Date().toISOString().split('T')[0];
+        }
+        
+        function addCashEntry() {
+            const date = document.getElementById('cash-date').value;
+            const type = document.getElementById('cash-type').value;
+            const amount = parseFloat(document.getElementById('cash-amount').value) || 0;
+            if (!date || amount <= 0) { alert("Please enter valid date and amount"); return; }
+            data.cash.push({id: Date.now(), date, type, amount, desc: document.getElementById('cash-desc').value.trim(), ref: document.getElementById('cash-ref').value.trim()});
+            saveData(); hideModal('modal-cash'); renderCashTable();
+            if (document.getElementById('dashboard').classList.contains('active')) renderDashboard();
+        }
+        
+        function deleteCashEntry(id) {
+            if (!confirm("Delete this entry?")) return;
+            data.cash = data.cash.filter(e => e.id !== id);
+            saveData(); renderCashTable();
+        }
+        
+        // Bank
+        function renderBankTable() {
+            const tbody = document.getElementById('bank-table-body');
+            tbody.innerHTML = '';
+            let entries = [...data.bank];
+            entries.sort((a, b) => new Date(b.date) - new Date(a.date));
+            let balance = 0;
+            if (entries.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="px-4 py-6 text-center text-xs text-slate-400">No bank entries</td></tr>`;
+                return;
+            }
+            entries.forEach(entry => {
+                const amt = parseFloat(entry.amount) || 0;
+                if (entry.type === 'Credit') balance += amt; else balance -= amt;
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="px-4 py-[9px] text-xs font-medium">${entry.date}</td>
+                    <td class="px-4 py-[9px] text-xs">${entry.desc}</td>
+                    <td class="px-4 py-[9px] text-xs text-slate-500">${entry.bank} <span class="text-xs">(${entry.ref})</span></td>
+                    <td class="px-4 py-[9px] text-center"><span class="px-2.5 py-0.5 text-xs font-bold rounded-full ${entry.type === 'Credit' ? 'bg-blue-100 text-blue-700' : 'bg-orange-100 text-orange-700'}">${entry.type}</span></td>
+                    <td class="px-4 py-[9px] text-right font-extrabold">${formatMoney(amt)}</td>
+                    <td class="px-2"><button onclick="deleteBankEntry(${entry.id})" class="text-red-400 hover:text-red-600 text-xs">×</button></td>
+                `;
+                tbody.appendChild(row);
+            });
+            document.getElementById('bank-balance').innerHTML = formatMoney(balance);
+            document.getElementById('bank-total-entries').innerHTML = entries.length;
+        }
+        
+        function showAddBankModal() {
+            const modal = document.getElementById('modal-bank');
+            modal.classList.remove('hidden'); modal.classList.add('flex');
+            document.getElementById('bank-date').value = new Date().toISOString().split('T')[0];
+        }
+        
+        function addBankEntry() {
+            const date = document.getElementById('bank-date').value;
+            const type = document.getElementById('bank-type').value;
+            const amount = parseFloat(document.getElementById('bank-amount').value) || 0;
+            if (!date || amount <= 0) return alert("Valid date and amount required");
+            data.bank.push({id: Date.now(), date, type, amount, desc: document.getElementById('bank-desc').value.trim(), bank: document.getElementById('bank-name').value, ref: document.getElementById('bank-ref').value.trim()});
+            saveData(); hideModal('modal-bank'); renderBankTable();
+        }
+        
+        function deleteBankEntry(id) {
+            if (!confirm("Delete bank entry?")) return;
+            data.bank = data.bank.filter(e => e.id !== id);
+            saveData(); renderBankTable();
+        }
+        
+        // Purchase
+        function calculatePurchaseGST() {
+            const taxable = parseFloat(document.getElementById('purchase-taxable').value) || 0;
+            const rate = parseFloat(document.getElementById('purchase-gst-rate').value) || 18;
+            const gst = taxable * (rate / 100);
+            document.getElementById('purchase-cgst').value = (gst / 2).toFixed(2);
+            document.getElementById('purchase-sgst').value = (gst / 2).toFixed(2);
+            document.getElementById('purchase-total').value = (taxable + gst).toFixed(2);
+        }
+        
+        function renderPurchasesTable() {
+            const tbody = document.getElementById('purchase-table-body');
+            tbody.innerHTML = '';
+            let entries = [...data.purchases];
+            entries.sort((a, b) => new Date(b.date) - new Date(a.date));
+            let tx = 0, gst = 0, grand = 0;
+            entries.forEach(e => {
+                tx += e.taxable || 0;
+                gst += (e.cgst || 0) + (e.sgst || 0);
+                grand += e.total || 0;
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="px-4 py-1 text-xs">${e.date}</td>
+                    <td class="px-4 py-1 text-xs font-semibold">${e.invoice}</td>
+                    <td class="px-4 py-1 text-xs">${e.supplier}</td>
+                    <td class="px-4 py-1 text-right text-xs">${formatMoney(e.taxable)}</td>
+                    <td class="px-4 py-1 text-center"><span class="bg-teal-100 text-teal-700 px-2 rounded text-[10px]">${e.gstRate}%</span></td>
+                    <td class="px-4 py-1 text-right font-extrabold text-xs">${formatMoney(e.total)}</td>
+                    <td class="px-1"><button onclick="deletePurchaseEntry(${e.id})" class="text-red-400 text-xs">×</button></td>
+                `;
+                tbody.appendChild(row);
+            });
+            document.getElementById('purchase-taxable-total').innerHTML = formatMoney(tx);
+            document.getElementById('purchase-gst-total').innerHTML = formatMoney(gst);
+            document.getElementById('purchase-grand-total').innerHTML = formatMoney(grand);
+        }
+        
+        function filterPurchasesTable() {
+            const q = document.getElementById('purchase-search').value.toLowerCase();
+            const gst = document.getElementById('purchase-gst-filter').value;
+            const filtered = data.purchases.filter(p => {
+                const match = !q || (p.invoice + p.supplier + p.item).toLowerCase().includes(q);
+                const gstMatch = !gst || p.gstRate == gst;
+                return match && gstMatch;
+            });
+            renderPurchasesTable(filtered);
+        }
+        
+        function showAddPurchaseModal() {
+            const modal = document.getElementById('modal-purchase');
+            modal.classList.remove('hidden'); modal.classList.add('flex');
+            document.getElementById('purchase-date').value = new Date().toISOString().split('T')[0];
+            document.getElementById('purchase-gst-rate').value = data.settings.defaultGST || '18';
+        }
+        
+        function addPurchaseEntry() {
+            const date = document.getElementById('purchase-date').value;
+            const taxable = parseFloat(document.getElementById('purchase-taxable').value) || 0;
+            if (!date || taxable <= 0) return alert("Date and taxable amount required");
+            data.purchases.push({
+                id: Date.now(), date,
+                invoice: document.getElementById('purchase-invoice').value,
+                supplier: document.getElementById('purchase-supplier').value,
+                item: document.getElementById('purchase-item').value,
+                qty: parseFloat(document.getElementById('purchase-qty').value) || 0,
+                unit: document.getElementById('purchase-unit').value,
+                taxable: taxable,
+                gstRate: parseFloat(document.getElementById('purchase-gst-rate').value),
+                cgst: parseFloat(document.getElementById('purchase-cgst').value) || 0,
+                sgst: parseFloat(document.getElementById('purchase-sgst').value) || 0,
+                total: parseFloat(document.getElementById('purchase-total').value) || 0
+            });
+            saveData(); hideModal('modal-purchase'); renderPurchasesTable();
+            if (document.getElementById('stock').classList.contains('active')) renderStockData();
+        }
+        
+        function deletePurchaseEntry(id) {
+            data.purchases = data.purchases.filter(e => e.id !== id);
+            saveData(); renderPurchasesTable();
+        }
+        
+        // Sales
+        function calculateSalesGST() {
+            const qty = parseFloat(document.getElementById('sales-qty').value) || 0;
+            const rate = parseFloat(document.getElementById('sales-rate').value) || 0;
+            const taxable = qty * rate / 1000;
+            const gstRate = parseFloat(document.getElementById('sales-gst-rate').value) || 18;
+            const gst = taxable * gstRate / 100;
+            document.getElementById('sales-taxable').value = taxable.toFixed(2);
+            document.getElementById('sales-gst').value = gst.toFixed(2);
+            document.getElementById('sales-total').value = (taxable + gst).toFixed(2);
+        }
+        
+        function renderSalesTable() {
+            const tbody = document.getElementById('sales-table-body');
+            tbody.innerHTML = '';
+            let entries = [...data.sales];
+            entries.sort((a, b) => new Date(b.date) - new Date(a.date));
+            let tx = 0, gst = 0, grand = 0;
+            entries.forEach(e => {
+                tx += e.taxable || 0; gst += e.gstAmount || 0; grand += e.total || 0;
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="px-4 py-1 text-xs">${e.date}</td>
+                    <td class="px-4 py-1 text-xs font-semibold">${e.invoice}</td>
+                    <td class="px-4 py-1 text-xs">${e.customer}</td>
+                    <td class="px-4 py-1 text-xs"><span class="bg-violet-100 text-violet-700 px-2 rounded">${e.size}</span></td>
+                    <td class="px-4 py-1 text-right font-extrabold text-xs">${formatMoney(e.total)}</td>
+                    <td class="px-1"><button onclick="deleteSalesEntry(${e.id})" class="text-red-400 text-xs">×</button></td>
+                `;
+                tbody.appendChild(row);
+            });
+            document.getElementById('sales-taxable-total').innerHTML = formatMoney(tx);
+            document.getElementById('sales-gst-total').innerHTML = formatMoney(gst);
+            document.getElementById('sales-grand-total').innerHTML = formatMoney(grand);
+        }
+        
+        function filterSalesTable() {
+            const q = document.getElementById('sales-search').value.toLowerCase();
+            const filtered = data.sales.filter(s => (s.customer + s.invoice).toLowerCase().includes(q));
+            renderSalesTable(filtered);
+        }
+        
+        function showAddSalesModal() {
+            const modal = document.getElementById('modal-sales');
+            modal.classList.remove('hidden'); modal.classList.add('flex');
+            document.getElementById('sales-date').value = new Date().toISOString().split('T')[0];
+        }
+        
+        function addSalesEntry() {
+            const date = document.getElementById('sales-date').value;
+            const taxable = parseFloat(document.getElementById('sales-taxable').value) || 0;
+            if (!date || taxable <= 0) return alert("Date and taxable amount required");
+            data.sales.push({
+                id: Date.now(), date,
+                invoice: document.getElementById('sales-invoice').value,
+                customer: document.getElementById('sales-customer').value,
+                size: document.getElementById('sales-size').value,
+                qty: parseFloat(document.getElementById('sales-qty').value) || 0,
+                rate: parseFloat(document.getElementById('sales-rate').value) || 0,
+                taxable: taxable,
+                gstRate: parseFloat(document.getElementById('sales-gst-rate').value),
+                gstAmount: parseFloat(document.getElementById('sales-gst').value) || 0,
+                total: parseFloat(document.getElementById('sales-total').value) || 0
+            });
+            saveData(); hideModal('modal-sales'); renderSalesTable();
+        }
+        
+        function deleteSalesEntry(id) {
+            data.sales = data.sales.filter(e => e.id !== id);
+            saveData(); renderSalesTable();
+        }
+        
+        // Stock
+        function renderStockData() {
+            const tbody = document.getElementById('raw-stock-body');
+            tbody.innerHTML = '';
+            const raw = {};
+            data.purchases.forEach(p => {
+                const key = (p.item || '').toLowerCase();
+                if (!raw[key]) raw[key] = {name: p.item, purchased: 0, consumed: 0};
+                raw[key].purchased += parseFloat(p.qty) || 0;
+            });
+            data.productions.forEach(pr => {
+                if (!raw['kraft']) raw['kraft'] = {name: "Kraft Paper", purchased: 0, consumed: 0};
+                raw['kraft'].consumed += parseFloat(pr.paperUsed) || 0;
+            });
+            let totalBalance = 0;
+            Object.keys(raw).forEach(k => {
+                const item = raw[k];
+                const bal = item.purchased - item.consumed;
+                totalBalance += bal;
+                const row = document.createElement('tr');
+                row.innerHTML = `<td class="px-2 py-1 text-xs">${item.name}</td><td class="px-2 py-1 text-right text-xs">${item.purchased} kg</td><td class="px-2 py-1 text-right text-xs text-rose-600">${item.consumed} kg</td><td class="px-2 py-1 text-right text-xs font-bold">${bal} kg</td>`;
+                tbody.appendChild(row);
+            });
+            document.getElementById('raw-stock-total').innerHTML = totalBalance + ' kg';
+            
+            const ptb = document.getElementById('production-table-body');
+            ptb.innerHTML = '';
+            [...data.productions].sort((a,b) => new Date(b.date) - new Date(a.date)).forEach(pr => {
+                const row = document.createElement('tr');
+                row.innerHTML = `<td class="px-3 py-1 text-xs">${pr.date}</td><td class="px-3 py-1 text-xs">${pr.size}</td><td class="px-3 py-1 text-xs text-center">${pr.qty}</td><td class="px-3 py-1 text-xs text-center">${pr.paperUsed}</td><td class="px-2"><button onclick="deleteProductionEntry(${pr.id})" class="text-red-400 text-xs">×</button></td>`;
+                ptb.appendChild(row);
+            });
+        }
+        
+        function showAddProductionModal() {
+            const modal = document.getElementById('modal-production');
+            modal.classList.remove('hidden'); modal.classList.add('flex');
+            document.getElementById('prod-date').value = new Date().toISOString().split('T')[0];
+        }
+        
+        function addProductionEntry() {
+            const date = document.getElementById('prod-date').value;
+            const qty = parseFloat(document.getElementById('prod-qty').value) || 0;
+            if (!date || qty <= 0) return alert("Date and quantity required");
+            data.productions.push({
+                id: Date.now(),
+                date,
+                size: document.getElementById('prod-size').value,
+                qty,
+                paperUsed: parseFloat(document.getElementById('prod-paper').value) || 0,
+                remarks: document.getElementById('prod-remarks').value
+            });
+            saveData(); hideModal('modal-production'); renderStockData();
+        }
+        
+        function deleteProductionEntry(id) {
+            data.productions = data.productions.filter(e => e.id !== id);
+            saveData(); renderStockData();
+        }
+        
+        function showAddRawPurchaseModal() { showAddPurchaseModal(); }
+        
+        // Wages
+        function renderWagesTable(filtered = null) {
+            const tbody = document.getElementById('wages-table-body');
+            tbody.innerHTML = '';
+            let entries = filtered || [...data.wages];
+            entries.sort((a, b) => new Date(b.date) - new Date(a.date));
+            let total = 0;
+            entries.forEach(w => {
+                total += w.amount || 0;
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="px-4 py-1 text-xs">${w.date}</td>
+                    <td class="px-4 py-1 text-xs font-semibold">${w.employee}</td>
+                    <td class="px-4 py-1 text-xs">${w.period}</td>
+                    <td class="px-4 py-1 text-right font-extrabold text-xs">${formatMoney(w.amount)}</td>
+                    <td class="px-1"><button onclick="deleteWagesEntry(${w.id})" class="text-red-400 text-xs">×</button></td>
+                `;
+                tbody.appendChild(row);
+            });
+            document.getElementById('wages-total').innerHTML = formatMoney(total);
+            document.getElementById('wages-count').innerHTML = entries.length;
+        }
+        
+        function filterWagesTable() {
+            const q = document.getElementById('wages-search').value.toLowerCase();
+            const filtered = data.wages.filter(w => w.employee.toLowerCase().includes(q));
+            renderWagesTable(filtered);
+        }
+        
+        function showAddWagesModal() {
+            const modal = document.getElementById('modal-wages');
+            modal.classList.remove('hidden'); modal.classList.add('flex');
+            document.getElementById('wage-date').value = new Date().toISOString().split('T')[0];
+        }
+        
+        function addWagesEntry() {
+            const date = document.getElementById('wage-date').value;
+            const amount = parseFloat(document.getElementById('wage-amount').value) || 0;
+            if (!date || amount <= 0) return alert("Date and amount required");
+            data.wages.push({
+                id: Date.now(),
+                date,
+                employee: document.getElementById('wage-employee').value,
+                period: document.getElementById('wage-period').value,
+                amount,
+                ref: document.getElementById('wage-ref').value
+            });
+            saveData(); hideModal('modal-wages'); renderWagesTable();
+        }
+        
+        function deleteWagesEntry(id) {
+            data.wages = data.wages.filter(e => e.id !== id);
+            saveData(); renderWagesTable();
+        }
+        
+        // Reports
+        function renderReports() {
+            const gstOut = data.sales.reduce((sum, s) => sum + (s.gstAmount || 0), 0);
+            const gstIn = data.purchases.reduce((sum, p) => sum + ((p.cgst || 0) + (p.sgst || 0)), 0);
+            document.getElementById('report-gst-output').innerHTML = formatMoney(gstOut);
+            document.getElementById('report-gst-input').innerHTML = formatMoney(gstIn);
+            document.getElementById('report-gst-net').innerHTML = formatMoney(gstOut - gstIn);
+        }
+        
+        // Exports
+        function downloadCSV(content, filename) {
+            const blob = new Blob([content], {type: 'text/csv'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+        
+        function exportCashCSV() {
+            let csv = "Date,Type,Description,Amount\n";
+            data.cash.forEach(e => csv += `${e.date},${e.type},"${e.desc || ''}",${e.amount}\n`);
+            downloadCSV(csv, 'cash-book.csv');
+        }
+        
+        function exportBankCSV() {
+            let csv = "Date,Type,Description,Amount\n";
+            data.bank.forEach(e => csv += `${e.date},${e.type},"${e.desc || ''}",${e.amount}\n`);
+            downloadCSV(csv, 'bank-book.csv');
+        }
+        
+        function exportPurchasesCSV() {
+            let csv = "Date,Invoice,Supplier,Total\n";
+            data.purchases.forEach(e => csv += `${e.date},${e.invoice},"${e.supplier}",${e.total}\n`);
+            downloadCSV(csv, 'purchases.csv');
+        }
+        
+        function exportSalesCSV() {
+            let csv = "Date,Invoice,Customer,Total\n";
+            data.sales.forEach(e => csv += `${e.date},${e.invoice},"${e.customer}",${e.total}\n`);
+            downloadCSV(csv, 'sales.csv');
+        }
+        
+        function exportProductionCSV() {
+            let csv = "Date,Size,Quantity,PaperUsed\n";
+            data.productions.forEach(e => csv += `${e.date},${e.size},${e.qty},${e.paperUsed}\n`);
+            downloadCSV(csv, 'production.csv');
+        }
+        
+        function exportGSTReport() {
+            let csv = "Type,Total,GST\n";
+            data.sales.forEach(s => csv += `Sales,${s.total},${s.gstAmount}\n`);
+            data.purchases.forEach(p => csv += `Purchase,${p.total},${(p.cgst||0)+(p.sgst||0)}\n`);
+            downloadCSV(csv, 'gst-report.csv');
+        }
+        
+        function exportAllData() {
+            const json = JSON.stringify(data, null, 2);
+            const blob = new Blob([json], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `paperbag-backup-${new Date().toISOString().slice(0,10)}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+        
+        function importDataPrompt() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = function(ev) {
+                    try {
+                        const imported = JSON.parse(ev.target.result);
+                        if (confirm("Replace all current data with this backup?")) {
+                            data = imported;
+                            saveData();
+                            location.reload();
+                        }
+                    } catch (err) {
+                        alert("Invalid backup file");
+                    }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+        
+        function resetAllData() {
+            if (confirm("Reset ALL data? This cannot be undone.")) {
+                localStorage.removeItem('paperbag_accounting');
+                location.reload();
+            }
+        }
+        
+        function showSettingsModal() {
+            const modal = document.getElementById('modal-settings');
+            modal.classList.remove('hidden'); modal.classList.add('flex');
+            document.getElementById('setting-company').value = data.settings.companyName || '';
+            document.getElementById('setting-gstin').value = data.settings.gstin || '';
+            document.getElementById('setting-address').value = data.settings.address || '';
+            document.getElementById('setting-default-gst').value = data.settings.defaultGST || '18';
+        }
+        
+        function saveSettings() {
+            data.settings.companyName = document.getElementById('setting-company').value || "Shree Paper Bags";
+            data.settings.gstin = document.getElementById('setting-gstin').value;
+            data.settings.address = document.getElementById('setting-address').value;
+            data.settings.defaultGST = document.getElementById('setting-default-gst').value;
+            saveData();
+            updateHeader();
+            hideModal('modal-settings');
+        }
+        
+        function hideModal(id) {
+            const m = document.getElementById(id);
+            m.classList.remove('flex');
+            m.classList.add('hidden');
+        }
+        
+        function init() {
+            loadData();
+            setCurrentDate();
+            document.getElementById('dashboard').classList.add('active');
+            document.getElementById('nav-dashboard').classList.add('active');
+            
+            renderDashboard();
+            renderCashTable();
+            renderBankTable();
+            renderPurchasesTable();
+            renderSalesTable();
+            renderWagesTable();
+            
+            // PWA support
+            const link = document.createElement('link');
+            link.rel = 'manifest';
+            link.href = 'manifest.json';
+            document.head.appendChild(link);
+            
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('service-worker.js').catch(() => {});
+            }
+            
+            window.addEventListener('beforeunload', saveData);
+        }
+        
+        window.onload = init;
+    </script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a0e384fe7f165492',t:'MTc4MTg4MjQ0NA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
